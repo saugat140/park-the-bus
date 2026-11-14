@@ -1,0 +1,16 @@
+# Clubs whose current league (P118) is the competition in VALUES.
+# Default is the Premier League. tools/wikidata/run-career-coverage.ps1
+# replaces that id. P118 does not include relegated clubs.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/clubs-in-league.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (career coverage spike)"
+
+SELECT DISTINCT ?club WHERE {
+  VALUES ?league { wd:Q9448 }
+  VALUES ?clubType { wd:Q476028 wd:Q103229495 }
+  ?club wdt:P31 ?clubType ;
+        wdt:P118 ?league .
+}

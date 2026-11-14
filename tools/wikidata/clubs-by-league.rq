@@ -1,0 +1,33 @@
+# Clubs in the sample: association football clubs (Q476028 or Q103229495)
+# whose league (P118) is one of the seven competitions.
+#
+# P118 is usually the current league, so this is about today's members, not
+# every club that ever played in the competition. Relegated clubs are missing.
+# Items that are people are excluded; an unfiltered P118 count is mostly players.
+#
+# League ids were checked against English descriptions on 2026-11-13.
+# Bundesliga (Q82595) and Serie A (Q15804) have no English rdfs:label, so the
+# name is fixed in this query.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/clubs-by-league.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (career coverage spike)"
+
+SELECT ?leagueName (COUNT(DISTINCT ?club) AS ?clubs) WHERE {
+  VALUES (?league ?leagueName) {
+    (wd:Q9448 "Premier League")
+    (wd:Q324867 "La Liga")
+    (wd:Q15804 "Serie A")
+    (wd:Q82595 "Bundesliga")
+    (wd:Q13394 "Ligue 1")
+    (wd:Q19510 "EFL Championship")
+    (wd:Q152665 "2. Bundesliga")
+  }
+  VALUES ?clubType { wd:Q476028 wd:Q103229495 }
+  ?club wdt:P31 ?clubType ;
+        wdt:P118 ?league .
+}
+GROUP BY ?leagueName
+ORDER BY ?leagueName

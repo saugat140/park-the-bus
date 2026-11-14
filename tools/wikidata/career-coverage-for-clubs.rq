@@ -1,0 +1,57 @@
+# Date coverage of club spells (P54, member of sports team) for the clubs in VALUES.
+# Default is one club so the file runs as-is. The runner replaces that id
+# with a small batch. A whole league in one request times out on the public
+# query service.
+#
+# A spell is one non-deprecated P54 statement from a person whose occupation
+# is association football player (Q937857).
+#   withStart      has P580
+#   withEnd        has P582
+#   preferredOpen  preferred rank and no end date (treated as the current club)
+#   complete       has a start, and an end or preferred rank
+#   pre1990        has a start before 1990-01-01
+#   pre1990WithEnd pre1990 and has an end
+# pre1990 cannot see a spell that has no start date.
+
+SELECT (COUNT(DISTINCT ?spell) AS ?spells)
+  (COUNT(DISTINCT ?startSpell) AS ?withStart)
+  (COUNT(DISTINCT ?endSpell) AS ?withEnd)
+  (COUNT(DISTINCT ?completeSpell) AS ?complete)
+  (COUNT(DISTINCT ?openSpell) AS ?preferredOpen)
+  (COUNT(DISTINCT ?preSpell) AS ?pre1990)
+  (COUNT(DISTINCT ?preEndSpell) AS ?pre1990WithEnd)
+WHERE {
+  VALUES ?club { wd:Q9616 }
+  ?spell ps:P54 ?club ;
+         wikibase:rank ?rank .
+  FILTER(?rank != wikibase:DeprecatedRank)
+  ?player p:P54 ?spell ;
+          wdt:P106 wd:Q937857 .
+  OPTIONAL { ?spell pq:P580 ?start . BIND(?spell AS ?startSpell) }
+  OPTIONAL { ?spell pq:P582 ?end . BIND(?spell AS ?endSpell) }
+  OPTIONAL {
+    FILTER(?rank = wikibase:PreferredRank)
+    FILTER NOT EXISTS { ?spell pq:P582 [] }
+    BIND(?spell AS ?openSpell)
+  }
+  OPTIONAL {
+    ?spell pq:P580 ?cstart .
+    {
+      ?spell pq:P582 ?cend .
+    } UNION {
+      ?spell wikibase:rank wikibase:PreferredRank .
+    }
+    BIND(?spell AS ?completeSpell)
+  }
+  OPTIONAL {
+    ?spell pq:P580 ?pstart .
+    FILTER(?pstart < "1990-01-01T00:00:00Z"^^xsd:dateTime)
+    BIND(?spell AS ?preSpell)
+  }
+  OPTIONAL {
+    ?spell pq:P580 ?pstart2 .
+    ?spell pq:P582 ?pend .
+    FILTER(?pstart2 < "1990-01-01T00:00:00Z"^^xsd:dateTime)
+    BIND(?spell AS ?preEndSpell)
+  }
+}

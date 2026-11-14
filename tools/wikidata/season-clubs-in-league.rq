@@ -1,0 +1,14 @@
+# Club-season pairs for one competition: a season (P3450) of the league and a
+# participating club (P1923) typed as an association football club.
+# Default is the Premier League. The runner replaces that id.
+# Use this to count clubs that have ever taken part. Do not mix those clubs
+# into another league's spell sample: a club that has been in two divisions
+# would contribute its whole history to both.
+
+SELECT ?club ?season WHERE {
+  VALUES ?league { wd:Q9448 }
+  ?season wdt:P3450 ?league ;
+          wdt:P1923 ?club .
+  VALUES ?clubType { wd:Q476028 wd:Q103229495 }
+  ?club wdt:P31 ?clubType .
+}
