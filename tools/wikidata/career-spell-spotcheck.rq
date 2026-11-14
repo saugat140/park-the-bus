@@ -1,0 +1,31 @@
+# List club spells for a handful of players. Replace the ids in VALUES, then
+# compare the rows to a career you trust. This query does not judge correctness.
+#
+# Suggested checks, one each: a current star, a pre-1990 career, a lower-league
+# regular, a loan-heavy career, and a player who played for two clubs that
+# would make a prompt (Ajax and Barcelona is the example in the product notes).
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/career-spell-spotcheck.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (career coverage spike)"
+
+SELECT ?playerLabel ?clubLabel ?start ?end ?rank WHERE {
+  VALUES ?player {
+    wd:Q28967995  # Erling Haaland, current
+    wd:Q45901     # Thierry Henry, two big clubs
+    wd:Q17163     # Johan Cruyff, Ajax and Barcelona, pre-1990
+    wd:Q191492    # Bobby Moore, retired before 1990
+    wd:Q326397    # Jordan Rhodes, Championship career
+    wd:Q356797    # Joel Campbell, loan-heavy career
+  }
+  ?player p:P54 ?spell .
+  ?spell ps:P54 ?club ;
+         wikibase:rank ?rank .
+  FILTER(?rank != wikibase:DeprecatedRank)
+  OPTIONAL { ?spell pq:P580 ?start }
+  OPTIONAL { ?spell pq:P582 ?end }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?playerLabel ?start
