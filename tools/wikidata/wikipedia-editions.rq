@@ -1,0 +1,45 @@
+# Number of Wikipedia language editions for the pageview sample.
+# Counts sitelinks whose wiki group is "wikipedia", so Wiktionary,
+# Wikiquote, and the other sister projects are not included.
+# The player list is in step with tools/wikidata/enwiki-titles.rq.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/wikipedia-editions.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (pageview prior spike)"
+
+SELECT ?player ?playerLabel ?editions WHERE {
+  {
+    SELECT ?player (COUNT(DISTINCT ?site) AS ?editions) WHERE {
+      VALUES ?player {
+        wd:Q615       # Lionel Messi
+        wd:Q11571     # Cristiano Ronaldo
+        wd:Q21621995  # Kylian Mbappé
+        wd:Q28967995  # Erling Haaland
+        wd:Q357984    # Kevin De Bruyne
+        wd:Q59306386  # Bukayo Saka
+        wd:Q969725    # Harry Kane
+        wd:Q439722    # Son Heung-min
+        wd:Q96072055  # Jamal Musiala
+        wd:Q43666     # Thomas Müller (born 1989)
+        wd:Q45901     # Thierry Henry
+        wd:Q1835      # Zinedine Zidane
+        wd:Q17163     # Johan Cruyff
+        wd:Q12897     # Pelé (1940–2022)
+        wd:Q191492    # Bobby Moore
+        wd:Q102331    # Sócrates
+        wd:Q326397    # Jordan Rhodes
+        wd:Q740239    # Billy Sharp
+        wd:Q356797    # Joel Campbell
+        wd:Q56043497  # David Strelec
+      }
+      ?article schema:about ?player ;
+               schema:isPartOf ?site .
+      ?site wikibase:wikiGroup "wikipedia" .
+    }
+    GROUP BY ?player
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY DESC(?editions)
