@@ -1,0 +1,20 @@
+# Men's Ballon d'Or winners on Wikidata.
+# Q166177 is the annual association football award. Q2291862 is the
+# joint FIFA Ballon d'Or (2010-2015). Both are included. Women's
+# Ballon d'Or is a different item and is not in this list.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/ballon-dor-winners.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (non-club draft spike)"
+
+SELECT ?player ?playerLabel ?awardLabel ?when WHERE {
+  VALUES ?award { wd:Q166177 wd:Q2291862 }
+  ?player p:P166 ?stmt .
+  ?stmt ps:P166 ?award .
+  FILTER NOT EXISTS { ?stmt wikibase:rank wikibase:DeprecatedRank . }
+  OPTIONAL { ?stmt pq:P585 ?when . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?when ?playerLabel
