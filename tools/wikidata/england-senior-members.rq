@@ -1,0 +1,21 @@
+# Players with a non-deprecated membership (P54) of the England men's
+# national team (Q47762). caps is P1350, the match count stored on
+# that statement. A blank caps is not zero. Dates are P580 and P582.
+# A 1 January date is year precision.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/england-senior-members.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (non-club draft spike)"
+
+SELECT ?player ?playerLabel ?caps ?start ?end WHERE {
+  ?player p:P54 ?stmt .
+  ?stmt ps:P54 wd:Q47762 .
+  FILTER NOT EXISTS { ?stmt wikibase:rank wikibase:DeprecatedRank . }
+  OPTIONAL { ?stmt pq:P1350 ?caps . }
+  OPTIONAL { ?stmt pq:P580 ?start . }
+  OPTIONAL { ?stmt pq:P582 ?end . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?playerLabel

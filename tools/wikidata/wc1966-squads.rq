@@ -1,0 +1,37 @@
+# Footballers marked as participating in the 1966 FIFA World Cup
+# (Q134202) who are also a member of one of the 16 finalist teams.
+# The squad items ("England at the 1966 FIFA World Cup" and the
+# other fifteen, class Q25000767) do not list their players.
+# Germany men's team (Q43310) is the item on the West Germany squad.
+#
+# Run:
+#   curl.exe -G "https://query.wikidata.org/sparql" ^
+#     --data-urlencode query@tools/wikidata/wc1966-squads.rq ^
+#     -H "Accept: text/csv" ^
+#     -H "User-Agent: ParkTheBus/0.1 (non-club draft spike)"
+
+SELECT DISTINCT ?team ?teamLabel ?player ?playerLabel WHERE {
+  VALUES ?team {
+    wd:Q79800    # Argentina
+    wd:Q83459    # Brazil
+    wd:Q180845   # Bulgaria
+    wd:Q172025   # Chile
+    wd:Q47762    # England
+    wd:Q47774    # France
+    wd:Q43310    # Germany (West Germany at this tournament)
+    wd:Q170561   # Hungary
+    wd:Q676899   # Italy
+    wd:Q164089   # Mexico
+    wd:Q14132    # North Korea
+    wd:Q267245   # Portugal
+    wd:Q189275   # Soviet Union
+    wd:Q42267    # Spain
+    wd:Q165141   # Switzerland
+    wd:Q134916   # Uruguay
+  }
+  ?player wdt:P1344 wd:Q134202 ;
+          wdt:P106 wd:Q937857 ;
+          wdt:P54 ?team .
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+ORDER BY ?teamLabel ?playerLabel
