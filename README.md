@@ -2,7 +2,7 @@
 
 Park the Bus is a free daily soccer trivia game. Everyone plays the same prompts. Many answers are valid, and a rarer correct answer scores more. The curated database is the source of truth. Wikidata and pageviews are drafting aids only.
 
-A Truepeak Software LLC game. This repository is separate from org-platform.
+A Truepeak Software LLC game. The [purpose note](docs/product-purpose.md) is the business record: who it is for, and no revenue in the MVP.
 
 ## Decisions
 
