@@ -19,4 +19,4 @@ A Truepeak Software LLC game. The [purpose note](docs/product-purpose.md) is the
 
 ## Status
 
-Research and setup. There is no application code in this repository yet. `api/`, `web/`, and CI arrive with the first code that needs them.
+The first schema is [`db/001_schema.sql`](db/001_schema.sql). The diagram is [`docs/db/erd.md`](docs/db/erd.md). `api/`, `web/`, and CI arrive with the first code that needs them.
