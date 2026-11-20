@@ -1,0 +1,7 @@
+kind,canonical_name,disambiguation,wikidata_qid,alias,accept_shared
+player,Thomas Müller,"Germany, born 1989",Q43666,Thomas Müller,no
+player,Thomas Müller,"Germany, born 1989",Q43666,Müller,no
+player,Cristiano Ronaldo,Portugal,Q11571,Cristiano Ronaldo,no
+player,Cristiano Ronaldo,Portugal,Q11571,Ronaldo,yes
+player,Ronaldo,"Brazil, born 1976",Q529207,Ronaldo,yes
+club,Arsenal,,Q9617,Arsenal FC,no

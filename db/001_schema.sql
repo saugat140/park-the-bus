@@ -12,6 +12,7 @@
 -- Then:
 --   psql -d park_the_bus -v ON_ERROR_STOP=1 -f db/001_schema_test.sql
 --
+-- Entity and alias CSV import is db/002_import_entities.sql.
 -- The test file rolls back. It does not leave players behind.
 -- Tier points below are a placeholder until issue #21 assigns ranges.
 
