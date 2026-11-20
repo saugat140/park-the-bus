@@ -1,7 +1,7 @@
 -- CSV import for entities and aliases. Issue #16.
 -- Apply after db/001_schema.sql. This does not add a curated table.
 -- Players and clubs share entity_aliases. There is no country, spell,
--- or honour import. Prompt answer lists are issue #55.
+-- or honour import. Prompt answer lists are db/003_import_prompt_answers.sql.
 --
 -- One row per alias. Repeat the entity columns on each of its rows.
 -- The canonical name is stored as an alias when the file does not
