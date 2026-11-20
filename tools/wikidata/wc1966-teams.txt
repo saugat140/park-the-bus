@@ -1,0 +1,18 @@
+# The 16 finalists at the 1966 World Cup. Germany is the West Germany item.
+# Squad items for this tournament do not hold the players.
+Q79800 Argentina
+Q83459 Brazil
+Q180845 Bulgaria
+Q172025 Chile
+Q47762 England
+Q47774 France
+Q43310 Germany
+Q170561 Hungary
+Q676899 Italy
+Q164089 Mexico
+Q14132 North Korea
+Q267245 Portugal
+Q189275 Soviet Union
+Q42267 Spain
+Q165141 Switzerland
+Q134916 Uruguay
