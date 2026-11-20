@@ -1,4 +1,4 @@
--- Smoke test for db/001_schema.sql. Issues #10 and #54.
+-- Smoke test for db/001_schema.sql. Issues #10, #54, and #56.
 -- Rolls back. Safe to run against a database that already has the schema.
 -- This is not the xUnit suite in issue #26.
 --
@@ -11,6 +11,41 @@
 -- cannot drop them before they reach the database.
 
 BEGIN;
+
+-- Issue #56. Tier 1 is the common end. Each higher tier is worth more.
+DO $$
+BEGIN
+  IF (SELECT count(*) FROM rarity_tiers) <> 6 THEN
+    RAISE EXCEPTION 'expected the six game tiers';
+  END IF;
+
+  IF EXISTS (
+    SELECT tier_number, display_name, points, min_rarity, max_rarity
+    FROM rarity_tiers
+    EXCEPT
+    SELECT *
+    FROM (VALUES
+      (1::smallint, 'Sunday League'::text, 10, NULL::numeric, NULL::numeric),
+      (2::smallint, 'Championship', 20, NULL, NULL),
+      (3::smallint, 'FA Cup', 40, NULL, NULL),
+      (4::smallint, 'Premier League', 60, NULL, NULL),
+      (5::smallint, 'Champions League', 80, NULL, NULL),
+      (6::smallint, 'World Cup', 100, NULL, NULL)
+    ) AS scale(tier_number, display_name, points, min_rarity, max_rarity)
+  ) THEN
+    RAISE EXCEPTION 'rarity tiers are not the game scale';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM rarity_tiers AS low
+    JOIN rarity_tiers AS high ON high.tier_number = low.tier_number + 1
+    WHERE high.points <= low.points
+  ) THEN
+    RAISE EXCEPTION 'a higher tier should be worth more points';
+  END IF;
+END;
+$$;
 
 INSERT INTO entities (kind, canonical_name, disambiguation) VALUES
   ('player', U&'Thomas M\00FCller', 'Germany, born 1989'),
@@ -155,7 +190,7 @@ BEGIN
   WHERE e.canonical_name = 'Harry Kane';
 
   IF points IS DISTINCT FROM 20 THEN
-    RAISE EXCEPTION 'Harry Kane should score the Championship placeholder, got %', points;
+    RAISE EXCEPTION 'Harry Kane should score Championship, got %', points;
   END IF;
 
   SELECT score_prompt_answer(prompt_id, e.id) INTO points
@@ -171,7 +206,7 @@ BEGIN
   WHERE e.canonical_name = U&'Thomas M\00FCller';
 
   IF points IS DISTINCT FROM 10 THEN
-    RAISE EXCEPTION 'Thomas Muller should score the Sunday League placeholder, got %', points;
+    RAISE EXCEPTION 'Thomas Muller should score Sunday League, got %', points;
   END IF;
 
   SELECT id INTO squad_id FROM prompts WHERE prompt_text = 'Name a squad player';
@@ -284,7 +319,7 @@ BEGIN
   WHERE e.canonical_name = 'Ronaldo';
 
   IF points IS DISTINCT FROM 80 THEN
-    RAISE EXCEPTION 'Ronaldo should score the Champions League placeholder, got %', points;
+    RAISE EXCEPTION 'Ronaldo should score Champions League, got %', points;
   END IF;
 
   SELECT score_prompt_answer(squad_id, e.id) INTO points

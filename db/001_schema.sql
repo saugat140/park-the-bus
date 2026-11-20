@@ -14,7 +14,8 @@
 --
 -- Entity and alias CSV import is db/002_import_entities.sql.
 -- The test file rolls back. It does not leave players behind.
--- Tier points below are a placeholder until issue #21 assigns ranges.
+-- Tier points below are the game scale. Issue #56.
+-- min_rarity and max_rarity stay empty until issue #21.
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS unaccent;
@@ -66,7 +67,13 @@ CREATE TABLE rarity_tiers (
 );
 
 COMMENT ON TABLE rarity_tiers IS
-  'Tier 1 is the common end of the scale. Tier 6 is the rare end. Points are a placeholder.';
+  'Tier 1 is the common end and scores the least. Tier 6 is the rare end and scores the most.';
+
+COMMENT ON COLUMN rarity_tiers.min_rarity IS
+  'Lower bound of the blended rarity for this tier. Empty until issue #21.';
+
+COMMENT ON COLUMN rarity_tiers.max_rarity IS
+  'Upper bound of the blended rarity for this tier. Empty until issue #21.';
 
 INSERT INTO rarity_tiers (tier_number, display_name, points) VALUES
   (1, 'Sunday League', 10),
