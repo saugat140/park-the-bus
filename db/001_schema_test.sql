@@ -1,5 +1,5 @@
--- Smoke test for db/001_schema.sql. Issues #10, #54, and #56.
--- Rolls back. Safe to run against a database that already has the schema.
+-- Smoke test for db/001_schema.sql. Issues #10, #54, #56, and #21.
+-- Rolls back. Apply db/004_tier_assignment.sql first so the tier bounds exist.
 -- This is not the xUnit suite in issue #26.
 --
 -- #54 adds the cases the first pass left out: curly apostrophes, a
@@ -25,12 +25,12 @@ BEGIN
     EXCEPT
     SELECT *
     FROM (VALUES
-      (1::smallint, 'Sunday League'::text, 10, NULL::numeric, NULL::numeric),
-      (2::smallint, 'Championship', 20, NULL, NULL),
-      (3::smallint, 'FA Cup', 40, NULL, NULL),
-      (4::smallint, 'Premier League', 60, NULL, NULL),
-      (5::smallint, 'Champions League', 80, NULL, NULL),
-      (6::smallint, 'World Cup', 100, NULL, NULL)
+      (1::smallint, 'Sunday League'::text, 10, 0::numeric, 20::numeric),
+      (2::smallint, 'Championship', 20, 20, 40),
+      (3::smallint, 'FA Cup', 40, 40, 60),
+      (4::smallint, 'Premier League', 60, 60, 80),
+      (5::smallint, 'Champions League', 80, 80, 100),
+      (6::smallint, 'World Cup', 100, 100, NULL)
     ) AS scale(tier_number, display_name, points, min_rarity, max_rarity)
   ) THEN
     RAISE EXCEPTION 'rarity tiers are not the game scale';
