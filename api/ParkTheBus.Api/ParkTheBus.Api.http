@@ -1,0 +1,6 @@
+@ParkTheBus.Api_HostAddress = http://localhost:5114
+
+GET {{ParkTheBus.Api_HostAddress}}/puzzles/today
+Accept: application/json
+
+###
