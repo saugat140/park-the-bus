@@ -19,4 +19,15 @@ A Truepeak Software LLC game. The [purpose note](docs/product-purpose.md) is the
 
 ## Status
 
-The first schema is [`db/001_schema.sql`](db/001_schema.sql). The diagram is [`docs/db/erd.md`](docs/db/erd.md). `api/`, `web/`, and CI arrive with the first code that needs them.
+The first schema is [`db/001_schema.sql`](db/001_schema.sql). The diagram is [`docs/db/erd.md`](docs/db/erd.md).
+
+`GET /puzzles/today` returns the prompts scheduled for the current UTC date. The body is the prompt text, its id, and its position. Answers, aliases, fame ratings, and tiers stay in the database. A date with nothing playable is not cached. A playable puzzle is cached until the next 00:00 UTC. The number of prompts is whatever that date has. Five or seven a day is still an open choice. `web/` and CI arrive with the first code that needs them.
+
+The API reads `ConnectionStrings__ParkTheBus`. Publish port 5432 on the local database, apply the schema, then:
+
+```powershell
+$env:ConnectionStrings__ParkTheBus = "Host=localhost;Database=park_the_bus;Username=postgres;Password=postgres"
+dotnet run --project api/ParkTheBus.Api
+```
+
+That password is only the local database. `dotnet test api/ParkTheBus.slnx` starts its own PostgreSQL 16 container and calls the route.
