@@ -1,10 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Npgsql;
 using ParkTheBus.Api.Puzzles;
 
 namespace ParkTheBus.Api.Tests;
@@ -13,7 +8,8 @@ namespace ParkTheBus.Api.Tests;
 public sealed class TodayPuzzleTests(PostgresFixture postgres) : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly List<WebApplicationFactory<Program>> _factories = [];
+    private readonly List<ApiFactory> _factories = [];
+
     [Fact]
     public async Task Today_returns_reviewed_prompts_in_position_order_and_caches_until_utc_midnight()
     {
@@ -34,13 +30,15 @@ public sealed class TodayPuzzleTests(PostgresFixture postgres) : IDisposable
 
         Assert.NotNull(puzzle);
         Assert.Equal(new DateOnly(2026, 11, 23), puzzle.PuzzleDate);
-        Assert.Equal(2, puzzle.Prompts.Count);
+        Assert.Equal(3, puzzle.Prompts.Count);
         Assert.Equal((short)1, puzzle.Prompts[0].Position);
         Assert.Equal(await PromptId("Name a forward from the sample"), puzzle.Prompts[0].PromptId);
         Assert.Equal("Name a forward from the sample", puzzle.Prompts[0].Text);
         Assert.Equal((short)2, puzzle.Prompts[1].Position);
         Assert.Equal(await PromptId("Name a club from the sample"), puzzle.Prompts[1].PromptId);
         Assert.Equal("Name a club from the sample", puzzle.Prompts[1].Text);
+        Assert.Equal((short)4, puzzle.Prompts[2].Position);
+        Assert.Equal("Name a Ronaldo", puzzle.Prompts[2].Text);
 
         AssertAbsent(raw);
     }
@@ -103,7 +101,7 @@ public sealed class TodayPuzzleTests(PostgresFixture postgres) : IDisposable
 
     private HttpClient ClientAt(DateTimeOffset utcNow)
     {
-        var factory = new TodayApiFactory(postgres.ConnectionString, utcNow);
+        var factory = new ApiFactory(postgres.ConnectionString, new TestClock(utcNow));
         _factories.Add(factory);
         return factory.CreateClient();
     }
@@ -116,7 +114,7 @@ public sealed class TodayPuzzleTests(PostgresFixture postgres) : IDisposable
 
     private async Task<long> PromptId(string text)
     {
-        await using var dataSource = NpgsqlDataSource.Create(postgres.ConnectionString);
+        await using var dataSource = Npgsql.NpgsqlDataSource.Create(postgres.ConnectionString);
         await using var command = dataSource.CreateCommand(
             "SELECT id FROM prompts WHERE prompt_text = $1");
         command.Parameters.AddWithValue(text);
@@ -144,22 +142,4 @@ public sealed class TodayPuzzleTests(PostgresFixture postgres) : IDisposable
         Assert.DoesNotContain("\"aliases\"", raw);
         Assert.DoesNotContain("\"fame\"", raw);
     }
-}
-
-file sealed class TodayApiFactory(string connectionString, DateTimeOffset utcNow) : WebApplicationFactory<Program>
-{
-    protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
-    {
-        builder.UseSetting("ConnectionStrings:ParkTheBus", connectionString);
-        builder.ConfigureTestServices(services =>
-        {
-            services.RemoveAll<TimeProvider>();
-            services.AddSingleton<TimeProvider>(new FixedClock(utcNow));
-        });
-    }
-}
-
-file sealed class FixedClock(DateTimeOffset utcNow) : TimeProvider
-{
-    public override DateTimeOffset GetUtcNow() => utcNow;
 }
