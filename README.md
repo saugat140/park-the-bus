@@ -21,7 +21,9 @@ A Truepeak Software LLC game. The [purpose note](docs/product-purpose.md) is the
 
 The first schema is [`db/001_schema.sql`](db/001_schema.sql). The diagram is [`docs/db/erd.md`](docs/db/erd.md).
 
-`GET /puzzles/today` returns the prompts scheduled for the current UTC date. The body is the prompt text, its id, and its position. Answers, aliases, fame ratings, and tiers stay in the database. A date with nothing playable is not cached. A playable puzzle is cached until the next 00:00 UTC. The number of prompts is whatever that date has. Five or seven a day is still an open choice. `web/` and CI arrive with the first code that needs them.
+`GET /puzzles/today` returns the prompts scheduled for the current UTC date. The body is the prompt text, its id, and its position. Answers, aliases, fame ratings, and tiers stay in the database. A date with nothing playable is not cached. A playable puzzle is cached until the next 00:00 UTC. The schedule length is whatever that date has. The product starting point is **6 prompts a day** (180 over 30 days).
+
+`POST /puzzles/today/prompts/{promptId}/start` records the server timer for a session. `POST /puzzles/today/prompts/{promptId}/answer` judges free text through SQL. One confident match is scored. Several matches return name and disambiguation only. After the prompt is finished for that session, the curated answer list (names, disambiguation, points) is returned. Start and answer are rate-limited. `web/` and CI arrive with the first code that needs them.
 
 The API reads `ConnectionStrings__ParkTheBus`. Publish port 5432 on the local database, apply the schema, then:
 
@@ -30,4 +32,4 @@ $env:ConnectionStrings__ParkTheBus = "Host=localhost;Database=park_the_bus;Usern
 dotnet run --project api/ParkTheBus.Api
 ```
 
-That password is only the local database. `dotnet test api/ParkTheBus.slnx` starts its own PostgreSQL 16 container and calls the route.
+That password is only the local database. `dotnet test api/ParkTheBus.slnx` starts its own PostgreSQL 16 container and calls the routes.
