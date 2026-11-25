@@ -20,6 +20,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
 builder.Services.AddSingleton<TodayPuzzleReader>();
 builder.Services.AddSingleton<PromptPlayService>();
+builder.Services.AddSingleton<AnswerReportService>();
 builder.Services.AddControllers();
 builder.Services.AddRateLimiter(options =>
 {
