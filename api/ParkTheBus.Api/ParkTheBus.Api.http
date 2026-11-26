@@ -27,3 +27,16 @@ X-Session-Id: {{sessionId}}
 }
 
 ###
+
+POST {{ParkTheBus.Api_HostAddress}}/puzzles/today/prompts/{{promptId}}/report
+Content-Type: application/json
+X-Session-Id: {{sessionId}}
+
+{
+  "sessionId": "{{sessionId}}",
+  "text": "example",
+  "kind": "missing",
+  "notes": "optional"
+}
+
+###
